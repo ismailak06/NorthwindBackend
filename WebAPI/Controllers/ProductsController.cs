@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Business.Abstract;
 using Entities.Concrete;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,6 +21,7 @@ namespace WebAPI.Controllers
             _productService = productService;
         }
         [HttpGet("getall")]
+        [Authorize()]
         public IActionResult GetList()
         {
             var result = _productService.GetList();
@@ -81,6 +83,18 @@ namespace WebAPI.Controllers
         public IActionResult Delete(Product product)
         {
             var result = _productService.Delete(product);
+            if (result.Success)
+            {
+                return Ok(result.Message);
+            }
+
+            return BadRequest(result.Message);
+        }
+
+        [HttpPost("transaction")]
+        public IActionResult TransactionTest(Product product)
+        {
+            var result = _productService.TransactionalOperation(product);
             if (result.Success)
             {
                 return Ok(result.Message);
